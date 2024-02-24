@@ -1,47 +1,37 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  ParseIntPipe,
-  ValidationPipe,
-} from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './Dtos/Create-User-dto';
-import { UpdateUserDto } from './Dtos/Update-User-Dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { UserService } from "./user.service";
+import { CreateUserDto } from "./Dtos/Create-User-dto";
+import { UpdateUserDto } from "./Dtos/Update-User-Dto";
+import { User } from "./userInterface/userInterFace";
 
-@Controller('user')
+@Controller('user') 
+
 export class UserController {
+  
   constructor(private readonly userService: UserService) {}
+
+  @Post()
+  async Create(@Body() CreateUserDto: CreateUserDto): Promise<User> {
+    return this.userService.create(CreateUserDto);
+  }
+
   @Get()
-  findall(@Query('role') role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
-    return this.userService.findall(role);
+  async findall(): Promise<User[]> {
+    return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findOne(id);
+  async findOne(@Param('id') id:string): Promise<User> {
+    return this.userService.findOne(id)
   }
 
-  @Post()
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) updateUserDto: UpdateUserDto,
-  ) {
-    return this.userService.update(id, updateUserDto);
+  @Patch(':id') 
+  async update(@Param('id') id:string, @Body() UpdateUserDto: UpdateUserDto ): Promise<User> {
+    return this.userService.update(id,UpdateUserDto);
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.delete(id);
+  async delete(@Param('id') id:string) : Promise<User>{
+    return this.userService.delete(id)
   }
 }

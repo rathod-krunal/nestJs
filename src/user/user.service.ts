@@ -1,81 +1,52 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './Dtos/Create-User-dto';
-import { UpdateUserDto } from './Dtos/Update-User-Dto';
-import { NotFoundException } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { User } from "./userInterface/userInterFace";
+import { CreateUserDto } from "./Dtos/Create-User-dto";
+import { UpdateUserDto } from "./Dtos/Update-User-Dto";
+import mongoose from "mongoose";
+
 
 @Injectable()
+
 export class UserService {
-  private users = [
-    {
-      id: 1,
-      name: 'Leanne Graham',
-      email: 'Sincere@april.biz',
-      role: 'INTERN',
-    },
-    {
-      id: 2,
-      name: 'Ervin Howell',
-      email: 'Shanna@melissa.tv',
-      role: 'INTERN',
-    },
-    {
-      id: 3,
-      name: 'Clementine Bauch',
-      email: 'Nathan@yesenia.net',
-      role: 'ENGINEER',
-    },
-    {
-      id: 4,
-      name: 'Patricia Lebsack',
-      email: 'Julianne.OConner@kory.org',
-      role: 'ENGINEER',
-    },
-    {
-      id: 5,
-      name: 'Chelsey Dietrich',
-      email: 'Lucio_Hettinger@annie.ca',
-      role: 'ADMIN',
-    },
-  ];
-  findall(role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
-    if (role) {
-      const rolesArray = this.users.filter((user) => user.role === role);
-      if (rolesArray.length === 0)
-        throw new NotFoundException('User Role Not Found');
-
-      return rolesArray;
-    }
-    return this.users;
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) {
+    this.connectToDatabase();
   }
 
-  findOne(id: number) {
-    const user = this.users.find((user) => user.id === id);
-    if (!user) throw new NotFoundException('User Not Found');
-    return user;
-  }
-
-  create(createUserDto: CreateUserDto) {
-    const userByHighestId = [...this.users].sort((a, b) => b.id - a.id);
-    const newUser = {
-      id: userByHighestId[0].id + 1,
-      ...createUserDto,
-    };
-    this.users.push(newUser);
-    return newUser;
-  }
-
-  update(id: number, updateUser: UpdateUserDto) {
-    this.users = this.users.map((user) => {
-      if (user.id === id) {
-        return { ...user, ...updateUser };
-      }
-      return user;
+  private connectToDatabase() {
+    mongoose.connection.on('connected', () => {
+      console.log('Connected to MongoDB');
     });
-    return this.findOne(id);
+
+    mongoose.connection.on('error', (err) => {
+      console.error('Failed to connect to MongoDB:', err);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('Disconnected from MongoDB');
+      // You might want to attempt reconnection here
+    });
   }
-  delete(id: number) {
-    const removedUser = this.findOne(id);
-    this.users = this.users.filter((user) => user.id !== id);
-    return this.users;
+
+  async create(CreateUserDto: CreateUserDto): Promise<User> {
+    const createUser = new this.userModel(CreateUserDto);
+    return createUser.save()
   }
-}
+
+  async update(id:string, UpdateUserDto: UpdateUserDto) : Promise<User> {
+    return this.userModel.findByIdAndUpdate(id,UpdateUserDto,{new:true})
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+
+  async findOne(id:string): Promise<User> {
+    return this.userModel.findById(id).exec();
+  }
+
+  async delete(id: string): Promise<User> {
+    return this.userModel.findByIdAndDelete(id);
+  }
+  }
