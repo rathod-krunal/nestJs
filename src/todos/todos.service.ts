@@ -12,7 +12,7 @@ export class TodosService {
 
   GetOne(id: number) {
     const todo = this.Todos.find((todo) => todo.id === id);
-    if(!todo) throw new NotFoundException('Todo Not Found')
+    if (!todo) throw new NotFoundException('Todo Not Found');
     return todo;
   }
 
@@ -42,5 +42,4 @@ export class TodosService {
 
     return deleteTodo;
   }
-
 }

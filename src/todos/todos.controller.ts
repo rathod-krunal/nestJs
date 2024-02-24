@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
   ParseIntPipe,
-  ValidationPipe
+  ValidationPipe,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { CreateTodoDto } from './Dtos/Create-Todo-Dto';
@@ -22,7 +22,7 @@ export class TodosController {
   }
 
   @Get(':id')
-  GetOne(@Param('id',ParseIntPipe) id: number) {
+  GetOne(@Param('id', ParseIntPipe) id: number) {
     return this.todosService.GetOne(id);
   }
 
@@ -32,12 +32,15 @@ export class TodosController {
   }
 
   @Patch(':id')
-  Update(@Param('id',ParseIntPipe) id: number, @Body(ValidationPipe) UpdateTodoDto: UpdateTodoDto) {
+  Update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) UpdateTodoDto: UpdateTodoDto,
+  ) {
     return this.todosService.Update(id, UpdateTodoDto);
   }
 
   @Delete(':id')
-  delete(@Param('id',ParseIntPipe) id: number) {
+  delete(@Param('id', ParseIntPipe) id: number) {
     return this.todosService.delete(id);
   }
 }

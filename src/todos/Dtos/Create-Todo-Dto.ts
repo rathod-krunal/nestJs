@@ -1,11 +1,8 @@
-
-import { IsNotEmpty, IsNumber  } from "class-validator"
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateTodoDto {
+  @IsNotEmpty()
+  Todo: string | number;
 
-    @IsNotEmpty()
-    Todo: string | number
-
-
-    IsCompleted : boolean
+  IsCompleted: boolean;
 }
