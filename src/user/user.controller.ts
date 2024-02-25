@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post,ValidationPipe } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./Dtos/Create-User-dto";
 import { UpdateUserDto } from "./Dtos/Update-User-Dto";
 import { User } from "./userInterface/userInterFace";
+
 
 @Controller('user') 
 
@@ -11,7 +12,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async Create(@Body() CreateUserDto: CreateUserDto): Promise<User> {
+  async Create(@Body(ValidationPipe) CreateUserDto: CreateUserDto): Promise<User> {
     return this.userService.create(CreateUserDto);
   }
 
@@ -26,7 +27,7 @@ export class UserController {
   }
 
   @Patch(':id') 
-  async update(@Param('id') id:string, @Body() UpdateUserDto: UpdateUserDto ): Promise<User> {
+  async update(@Param('id') id:string, @Body( ValidationPipe) UpdateUserDto: UpdateUserDto ): Promise<User> {
     return this.userService.update(id,UpdateUserDto);
   }
 
